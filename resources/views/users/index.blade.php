@@ -29,8 +29,13 @@
                         <td>{{$user->email}}</td>
                         <td>{{$user->address}}</td>
                         <td>
-                            <button class="btn btn-warning">Edit</button>
-                            <button class="btn btn-danger">Delete</button>
+                            <a href="{{route('users.edit',$user->id)}}" class="btn btn-warning">Edit</a>
+                            <form id="deleteForm{{ $user->id }}" action="{{route('users.destroy', $user->id)}}" class="form-floating" method="post">
+                                @method('DELETE')
+                                @csrf
+
+                            </form>
+                            <button data-form="deleteForm{{$user->id}}" class="btn btn-delete btn-danger">Delete</button>
                         </td>
                     </tr>
                 @endforeach
@@ -39,4 +44,30 @@
             <div>{{ $users->links() }}</div>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <script>
+        $(function (){
+            $(document).on('click', '.btn-delete', function (){
+                let formId = $(this).data('form')
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $(`#${formId}`).submit();
+                    }
+                })
+
+
+            })
+        })
+    </script>
 @endsection

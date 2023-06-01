@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUserRequest;
 use App\Models\User;
+use http\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -48,7 +50,9 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        return view('users.edit', compact('user'));
     }
 
     /**
@@ -56,7 +60,16 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $dataUpdate = $request->except('password');
+        if($request->password)
+        {
+            $dataUpdate['password'] = Hash::make($request->password);
+        }
+        $user->update($dataUpdate);
+
+        return redirect()->route('users.index')->with(['message' => 'Update Success !!!']);
+
     }
 
     /**
@@ -64,6 +77,10 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return redirect()->route('users.index')->with(['message' => 'Delete Success !!!']);
+
     }
 }
